@@ -48,7 +48,7 @@ public class AuthService {
         AuthResponDTO responDTO = new AuthResponDTO();
 
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signinRequest.getEmail(), signinRequest.getPassword()));
-        var user = userEntityRepository.findByEmail(signinRequest.getEmail()).orElseThrow();
+        var user = userEntityRepository.findByEmail(signinRequest.getEmail());
         System.out.println("User is " + user);
         var jwt = jwtUtils.generateToken(user);
         responDTO.setToken(jwt);

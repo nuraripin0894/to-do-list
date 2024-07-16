@@ -3,6 +3,7 @@ package enigma.to_do_list.service.implementation;
 import enigma.to_do_list.model.Task;
 import enigma.to_do_list.model.UserEntity;
 import enigma.to_do_list.repository.TaskRepository;
+import enigma.to_do_list.repository.UserEntityRepository;
 import enigma.to_do_list.service.TaskService;
 import enigma.to_do_list.service.UserEntityService;
 import enigma.to_do_list.utils.DTO.TaskDTO;
@@ -21,13 +22,16 @@ import java.text.SimpleDateFormat;
 @RequiredArgsConstructor
 public class TaskServiceImplementation implements TaskService {
     private final TaskRepository taskRepository;
+    private final UserEntityRepository userEntityRepository;
     private final UserEntityService userEntityService;
     @Autowired
     private JWTUtils jwtUtils;
 
     @Override
-    public Task create(TaskDTO request) {
-        UserEntity userEntity = userEntityService.getOne(request.getUser_id());
+    public Task create(TaskDTO request, String token) {
+        token = token.substring(7);
+        String username = jwtUtils.extractUsername(token);
+        UserEntity userEntity = userEntityRepository.findByEmail(username);
         Task task = new Task();
         task.setUser(userEntity);
         task.setTaskList(request.getTaskList());
@@ -66,7 +70,7 @@ public class TaskServiceImplementation implements TaskService {
         }
         else {
             Task task = this.getOne(id);
-            task.setUser(userEntityService.getOne(request.getUser_id()) != null ? userEntityService.getOne(request.getUser_id()) : task.getUser());
+            task.setUser(task.getUser());
             task.setTaskList(request.getTaskList() != null ? request.getTaskList() : task.getTaskList());
             task.setTaskDetail(request.getTaskDetail() != null ? request.getTaskDetail() : task.getTaskDetail());
             task.setTaskDate(request.getTaskDate() != null ? request.getTaskDate() : task.getTaskDate());

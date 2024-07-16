@@ -11,8 +11,6 @@ import java.util.Date;
 @Setter
 @Builder
 public class TaskDTO {
-    @NotNull
-    private Integer user_id;
     private String taskList;
     private String taskDetail;
     private Date taskDate;

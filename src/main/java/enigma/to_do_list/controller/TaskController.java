@@ -21,8 +21,9 @@ public class TaskController {
     private final TaskService taskService;
 
     @PostMapping
-    public ResponseEntity<?> create(@RequestBody TaskDTO request){
-        Task result = taskService.create(request);
+    public ResponseEntity<?> create(@RequestBody TaskDTO request,
+                                    @RequestHeader("Authorization") String token){
+        Task result = taskService.create(request, token);
         return Res.renderJson(
                 result,
                 "Data Has Been Created!",

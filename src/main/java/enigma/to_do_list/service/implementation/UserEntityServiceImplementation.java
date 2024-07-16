@@ -62,6 +62,6 @@ public class UserEntityServiceImplementation implements UserEntityService, UserD
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException{
-        return userEntityRepository.findByEmail(username).orElseThrow();
+        return userEntityRepository.findByEmail(username);
     }
 }
