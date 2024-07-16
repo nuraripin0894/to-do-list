@@ -30,6 +30,7 @@ public class JWTUtils {
     public String generateToken(UserEntity userEntity){
         return Jwts.builder()
                 .subject(userEntity.getUsername())
+                .claim("id", userEntity.getId())
                 .claim("authority", userEntity.getRole())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + jwtExpirationInMs))
@@ -42,13 +43,23 @@ public class JWTUtils {
     }
 
     public String extractUserAuth(String token) {
+        Claims claims = extractClaims2(token);
+        return claims.get("authority", String.class);
+    }
+
+    public Integer extractUserId(String token) {
+        Claims claims = extractClaims2(token);
+        return claims.get("id", Integer.class);
+    }
+
+    public Claims extractClaims2(String token) {
         Claims claims = Jwts.parser()
                 .verifyWith(key)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
 
-        return claims.get("authority", String.class);
+        return claims;
     }
 
     private <T> T extractClaims(String token, Function<Claims, T> claimsTFunction){

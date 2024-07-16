@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.text.Format;
 import java.text.SimpleDateFormat;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -30,10 +31,9 @@ public class TaskServiceImplementation implements TaskService {
     @Override
     public Task create(TaskDTO request, String token) {
         token = token.substring(7);
-        String username = jwtUtils.extractUsername(token);
-        UserEntity userEntity = userEntityRepository.findByEmail(username);
+        Integer id = jwtUtils.extractUserId(token);
         Task task = new Task();
-        task.setUser(userEntity);
+        task.setUser(userEntityRepository.findById(id).get());
         task.setTaskList(request.getTaskList());
         task.setTaskDetail(request.getTaskDetail());
         task.setTaskDate(request.getTaskDate());
@@ -49,11 +49,11 @@ public class TaskServiceImplementation implements TaskService {
     public Page<Task> getAll(Pageable pageable, String dayOfTask, String token)  {
         token = token.substring(7);
         String authority = jwtUtils.extractUserAuth(token);
-        String username = null;
+        Integer id = null;
         if(authority.equals("USER")) {
-            username = jwtUtils.extractUsername(token);
+            id = jwtUtils.extractUserId(token);
         }
-        Specification<Task> spec = TaskSpecification.getSpecification(dayOfTask, username);
+        Specification<Task> spec = TaskSpecification.getSpecification(dayOfTask, id);
         return taskRepository.findAll(spec, pageable);
     }
 

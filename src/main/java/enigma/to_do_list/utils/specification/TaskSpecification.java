@@ -7,12 +7,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TaskSpecification {
-    public static Specification<Task> getSpecification(String dayOfTask, String username){
+    public static Specification<Task> getSpecification(String dayOfTask, Integer id){
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
-            if(username != null && !username.isBlank()){
-                predicates.add(criteriaBuilder.equal(root.get("user").get("email"), username));
+            if(id != null){
+                predicates.add(criteriaBuilder.equal(root.get("user").get("id"), id));
             }
 
             if(dayOfTask != null && !dayOfTask.isBlank()){
