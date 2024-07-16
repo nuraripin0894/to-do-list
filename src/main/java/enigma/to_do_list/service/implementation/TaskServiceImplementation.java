@@ -8,6 +8,7 @@ import enigma.to_do_list.service.UserEntityService;
 import enigma.to_do_list.utils.DTO.TaskDTO;
 import enigma.to_do_list.utils.specification.TaskSpecification;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -21,6 +22,8 @@ import java.text.SimpleDateFormat;
 public class TaskServiceImplementation implements TaskService {
     private final TaskRepository taskRepository;
     private final UserEntityService userEntityService;
+    @Autowired
+    private JWTUtils jwtUtils;
 
     @Override
     public Task create(TaskDTO request) {
@@ -39,8 +42,14 @@ public class TaskServiceImplementation implements TaskService {
     }
 
     @Override
-    public Page<Task> getAll(Pageable pageable, String dayOfTask, Integer id)  {
-        Specification<Task> spec = TaskSpecification.getSpecification(dayOfTask, id);
+    public Page<Task> getAll(Pageable pageable, String dayOfTask, String token)  {
+        token = token.substring(7);
+        String authority = jwtUtils.extractUserAuth(token);
+        String username = null;
+        if(authority.equals("USER")) {
+            username = jwtUtils.extractUsername(token);
+        }
+        Specification<Task> spec = TaskSpecification.getSpecification(dayOfTask, username);
         return taskRepository.findAll(spec, pageable);
     }
 

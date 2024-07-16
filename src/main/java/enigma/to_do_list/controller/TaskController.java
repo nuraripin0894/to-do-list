@@ -7,6 +7,7 @@ import enigma.to_do_list.utils.PageResponWrapper;
 import enigma.to_do_list.utils.Res;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -31,11 +32,13 @@ public class TaskController {
 
     @GetMapping()
     public ResponseEntity<?> getAll(
-            @PageableDefault(size = 10) Pageable pageable,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String dayOfTask,
-            @RequestParam(required = false) Integer id
+            @RequestHeader("Authorization") String token
     ) {
-        Page<Task> res = taskService.getAll(pageable, dayOfTask, id);
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Task> res = taskService.getAll(pageable, dayOfTask, token);
         PageResponWrapper<Task> result = new PageResponWrapper<>(res);
         return Res.renderJson(
                 result,

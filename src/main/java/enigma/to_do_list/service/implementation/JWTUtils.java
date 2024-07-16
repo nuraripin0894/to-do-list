@@ -1,14 +1,17 @@
 package enigma.to_do_list.service.implementation;
 
+import enigma.to_do_list.model.UserEntity;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
-import org.springframework.beans.factory.annotation.Value;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
+import java.security.Key;
 import java.util.Base64;
 import java.util.Date;
 import java.util.function.Function;
@@ -24,9 +27,10 @@ public class JWTUtils {
         this.key = new SecretKeySpec(keyBytes, "HmacSHA256");
     }
 
-    public String generateToken(UserDetails userDetails){
+    public String generateToken(UserEntity userEntity){
         return Jwts.builder()
-                .subject(userDetails.getUsername())
+                .subject(userEntity.getUsername())
+                .claim("authority", userEntity.getRole())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + jwtExpirationInMs))
                 .signWith(key)
@@ -35,6 +39,16 @@ public class JWTUtils {
 
     public String extractUsername(String token){
         return extractClaims(token, Claims::getSubject);
+    }
+
+    public String extractUserAuth(String token) {
+        Claims claims = Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+
+        return claims.get("authority", String.class);
     }
 
     private <T> T extractClaims(String token, Function<Claims, T> claimsTFunction){

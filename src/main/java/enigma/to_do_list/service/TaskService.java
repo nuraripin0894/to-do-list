@@ -7,7 +7,7 @@ import org.springframework.data.domain.Pageable;
 
 public interface TaskService {
     Task create(TaskDTO request);
-    Page<Task> getAll(Pageable pageable, String dayOfTask, Integer id);
+    Page<Task> getAll(Pageable pageable, String dayOfTask, String token);
     Task getOne(Integer id);
     Task update(Integer id, TaskDTO request);
     void delete(Integer id);
