@@ -1,8 +1,6 @@
 package enigma.to_do_list.utils.DTO;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
-
 import java.util.Date;
 
 @AllArgsConstructor

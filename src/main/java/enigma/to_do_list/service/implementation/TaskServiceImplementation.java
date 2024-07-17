@@ -1,7 +1,6 @@
 package enigma.to_do_list.service.implementation;
 
 import enigma.to_do_list.model.Task;
-import enigma.to_do_list.model.UserEntity;
 import enigma.to_do_list.repository.TaskRepository;
 import enigma.to_do_list.repository.UserEntityRepository;
 import enigma.to_do_list.service.TaskService;
@@ -14,10 +13,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-
 import java.text.Format;
 import java.text.SimpleDateFormat;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
