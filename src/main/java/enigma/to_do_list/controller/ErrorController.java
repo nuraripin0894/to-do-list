@@ -58,10 +58,9 @@ public class ErrorController {
                     "(password must contain number, symbol, upper & lower case, " +
                     "should longer than 8 character (20 at max)";
         }
-        if(message.contains("Bad credentials")){
+        if(message.contains("Bad credentials") || message.contains("UserDetailsService returned null")){
             message = "Invalid e-mail or password!";
         }
-
 
         return Res.renderJson(null, message, status);
     }
