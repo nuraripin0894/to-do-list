@@ -27,7 +27,7 @@ public class JWTUtils {
         return Jwts.builder()
                 .subject(userEntity.getUsername())
                 .claim("id", userEntity.getId())
-                .claim("authority", userEntity.getRole())
+//                .claim("authority", userEntity.getRole())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + jwtExpirationInMs))
                 .signWith(key)
@@ -38,10 +38,10 @@ public class JWTUtils {
         return extractClaims(token, Claims::getSubject);
     }
 
-    public String extractUserAuth(String token) {
-        Claims claims = extractClaims2(token);
-        return claims.get("authority", String.class);
-    }
+//    public String extractUserAuth(String token) {
+//        Claims claims = extractClaims2(token);
+//        return claims.get("authority", String.class);
+//    }
 
     public Integer extractUserId(String token) {
         Claims claims = extractClaims2(token);

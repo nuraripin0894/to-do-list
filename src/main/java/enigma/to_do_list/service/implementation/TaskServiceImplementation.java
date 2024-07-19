@@ -1,10 +1,10 @@
 package enigma.to_do_list.service.implementation;
 
 import enigma.to_do_list.model.Task;
+import enigma.to_do_list.model.UserEntity;
 import enigma.to_do_list.repository.TaskRepository;
 import enigma.to_do_list.repository.UserEntityRepository;
 import enigma.to_do_list.service.TaskService;
-import enigma.to_do_list.service.UserEntityService;
 import enigma.to_do_list.utils.DTO.TaskDTO;
 import enigma.to_do_list.utils.specification.TaskSpecification;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,7 @@ import java.text.SimpleDateFormat;
 public class TaskServiceImplementation implements TaskService {
     private final TaskRepository taskRepository;
     private final UserEntityRepository userEntityRepository;
-    private final UserEntityService userEntityService;
+
     @Autowired
     private JWTUtils jwtUtils;
 
@@ -45,10 +45,10 @@ public class TaskServiceImplementation implements TaskService {
     @Override
     public Page<Task> getAll(Pageable pageable, String dayOfTask, String token)  {
         token = token.substring(7);
-        String authority = jwtUtils.extractUserAuth(token);
-        Integer id = null;
-        if(authority.equals("USER")) {
-            id = jwtUtils.extractUserId(token);
+        Integer id = jwtUtils.extractUserId(token);
+        UserEntity user = userEntityRepository.getOne(id);
+        if(user.getRole().equals("ADMIN")) {
+            id = null;
         }
         Specification<Task> spec = TaskSpecification.getSpecification(dayOfTask, id);
         return taskRepository.findAll(spec, pageable);
