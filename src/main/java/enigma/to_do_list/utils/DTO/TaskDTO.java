@@ -1,5 +1,7 @@
 package enigma.to_do_list.utils.DTO;
 
+import enigma.to_do_list.model.taskStatus;
+
 import lombok.*;
 import java.util.Date;
 
@@ -9,9 +11,8 @@ import java.util.Date;
 @Setter
 @Builder
 public class TaskDTO {
-    private String taskList;
-    private String taskDetail;
-    private Date taskDate;
+    private String title;
+    private String description;
     private Date dueDate;
-    private boolean completed;
+    private taskStatus status;
 }

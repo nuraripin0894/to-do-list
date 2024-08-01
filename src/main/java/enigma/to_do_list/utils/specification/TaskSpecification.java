@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TaskSpecification {
-    public static Specification<Task> getSpecification(String dayOfTask, Integer id){
+    public static Specification<Task> getSpecification(String status, Integer id){
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
@@ -15,9 +15,10 @@ public class TaskSpecification {
                 predicates.add(criteriaBuilder.equal(root.get("user").get("id"), id));
             }
 
-            if(dayOfTask != null && !dayOfTask.isBlank()){
-                predicates.add(criteriaBuilder.like(root.get("dayOfTask"), "%"+dayOfTask+"%"));
+            if(status != null && !status.isBlank()){
+                predicates.add(criteriaBuilder.like(root.get("status"), "%" + status + "%"));
             }
+
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };

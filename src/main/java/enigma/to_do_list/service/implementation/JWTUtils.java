@@ -10,12 +10,15 @@ import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 @Component
 public class JWTUtils {
     private SecretKey key;
     private static final long jwtExpirationInMs = 3600000;
+    private static final long refreshedJwtExpirationInMs = TimeUnit.DAYS.toMillis(7);;
 
     public JWTUtils(){
         String jwtSecret = "acbf1016208f638695ea77c37b1579ed92c589832ee15a3199b36cca1a96e63b";
@@ -27,9 +30,18 @@ public class JWTUtils {
         return Jwts.builder()
                 .subject(userEntity.getUsername())
                 .claim("id", userEntity.getId())
-//                .claim("authority", userEntity.getRole())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + jwtExpirationInMs))
+                .signWith(key)
+                .compact();
+    }
+
+    public String generateRefreshToken(HashMap<String, Object> claims, UserEntity userEntity){
+        return Jwts.builder()
+                .claims(claims)
+                .subject(userEntity.getUsername())
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + refreshedJwtExpirationInMs))
                 .signWith(key)
                 .compact();
     }
@@ -37,11 +49,6 @@ public class JWTUtils {
     public String extractUsername(String token){
         return extractClaims(token, Claims::getSubject);
     }
-
-//    public String extractUserAuth(String token) {
-//        Claims claims = extractClaims2(token);
-//        return claims.get("authority", String.class);
-//    }
 
     public Integer extractUserId(String token) {
         Claims claims = extractClaims2(token);

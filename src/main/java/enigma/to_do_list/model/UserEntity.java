@@ -26,12 +26,12 @@ public class UserEntity implements UserDetails {
     private Integer id;
 
     @NotEmpty(message = "Name is required!")
-    @Column(name = "username")
+    @Column(name = "username", unique = true)
     private String username;
 
     @NotEmpty(message = "E-mail is required!")
     @Email(message = "E-mail is not valid!")
-    @Column(name = "email")
+    @Column(name = "email", unique = true)
     private String email;
 
     @JsonIgnore

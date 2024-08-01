@@ -4,8 +4,11 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+
+import java.time.LocalDate;
 import java.util.Date;
 
 @Data
@@ -27,26 +30,29 @@ public class Task {
     @JoinColumn(name = "user_id")
     private UserEntity user;
 
-    @NotNull
-    @Column(name = "task_list")
-    private String taskList;
+    @NotEmpty(message = "Task title is required!")
+    @Column(name = "title")
+    private String title;
 
-    @Column(name = "task_detail")
-    private String taskDetail;
+    @NotEmpty(message = "Task description is required!")
+    @Column(name = "description")
+    private String description;
 
+    @NotNull(message = "Task due date is required!")
+    @JsonIgnore
     @Column(name = "day_of_task")
-    private String dayOfTask;
+    private String dayOfDueDate;
 
     @NotNull
-    @Column(name = "task_date")
     @JsonFormat(pattern = "yyyy-MM-dd")
     @Temporal(TemporalType.DATE)
-    private Date taskDate;
-
     @Column(name = "due_date")
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    @Temporal(TemporalType.DATE)
     private Date dueDate;
 
-    private boolean completed;
+    @Enumerated(EnumType.STRING)
+    private taskStatus status;
+
+    @Temporal(TemporalType.DATE)
+    @Column(name = "created_at")
+    private LocalDate createdAt;
 }

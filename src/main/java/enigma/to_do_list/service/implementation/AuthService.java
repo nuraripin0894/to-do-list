@@ -9,6 +9,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+
 @Service
 public class AuthService {
     @Autowired
@@ -34,11 +36,12 @@ public class AuthService {
             throw new RuntimeException("not strong enough!");
         }
         userEntity.setPassword(passwordEncoder.encode(regitrationRequest.getPassword()));
-        userEntity.setRole(regitrationRequest.getRole());
+        userEntity.setRole("USER");
         UserEntity userResult = userEntityRepository.save(userEntity);
         if(userResult != null && userResult.getId() > 0){
-            resp.setUsers(userResult);
-            resp.setMessage("User Saved Succesfully!");
+            resp.setId(userResult.getId());
+            resp.setUsername(userResult.getUsername());
+            resp.setEmail(userResult.getEmail());
         }
 
         return resp;
@@ -49,11 +52,27 @@ public class AuthService {
 
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signinRequest.getEmail(), signinRequest.getPassword()));
         var user = userEntityRepository.findByEmail(signinRequest.getEmail());
-        System.out.println("User is " + user);
         var jwt = jwtUtils.generateToken(user);
+        var refJwt = jwtUtils.generateRefreshToken(new HashMap<>(), user);
         responDTO.setToken(jwt);
-        responDTO.setExpirationTime("1 Hours");
-        responDTO.setMessage("Succesfully signed in!");
+        responDTO.setRefreshToken(refJwt);
+
+        return responDTO;
+    }
+
+    public AuthResponDTO refreshToken(AuthResponDTO refreshTokenRequest){
+        AuthResponDTO responDTO = new AuthResponDTO();
+        String ourEmail = jwtUtils.extractUsername(refreshTokenRequest.getToken());
+        System.out.println(ourEmail);
+        UserEntity users = userEntityRepository.findByEmail(ourEmail);
+        System.out.println(users);
+        if(jwtUtils.isTokenValid(refreshTokenRequest.getToken(), users)) {
+            var jwt = jwtUtils.generateToken(users);
+            responDTO.setToken(jwt);
+        }
+        else{
+            throw new RuntimeException("Please log in again.");
+        }
 
         return responDTO;
     }

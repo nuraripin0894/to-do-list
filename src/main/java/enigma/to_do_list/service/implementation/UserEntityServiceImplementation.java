@@ -1,10 +1,12 @@
 package enigma.to_do_list.service.implementation;
 
+import enigma.to_do_list.exception.CustomUserException;
 import enigma.to_do_list.model.UserEntity;
 import enigma.to_do_list.repository.UserEntityRepository;
 import enigma.to_do_list.service.UserEntityService;
 import enigma.to_do_list.utils.specification.UserEntitySpecification;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -20,7 +22,17 @@ public class UserEntityServiceImplementation implements UserEntityService, UserD
 
     @Override
     public UserEntity create(UserEntity request) {
-        return userEntityRepository.save(request);
+        try {
+            return userEntityRepository.save(request);
+        } catch (DataIntegrityViolationException e) {
+            if (e.getCause() != null && e.getCause().getMessage().contains("username")) {
+                throw new CustomUserException("Username already exists, please choose a different one.");
+            } else if (e.getCause() != null && e.getCause().getMessage().contains("email")) {
+                throw new CustomUserException("Email already exists, please choose a different one.");
+            } else {
+                throw new CustomUserException("An error occurred while creating the user.");
+            }
+        }
     }
 
     @Override
@@ -45,6 +57,7 @@ public class UserEntityServiceImplementation implements UserEntityService, UserD
             user.setUsername(request.getUsername() != null ? request.getUsername() : user.getUsername());
             user.setEmail(request.getEmail() != null ? request.getEmail() : user.getEmail());
             user.setPassword(request.getPassword() != null ? request.getPassword() : user.getPassword());
+            user.setRole(request.getRole() != null ? request.getRole() : user.getRole());
 
             return userEntityRepository.save(user);
         }

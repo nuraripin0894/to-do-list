@@ -14,7 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/task")
+@RequestMapping("/api/todos")
 @RequiredArgsConstructor
 public class TaskController {
     private final TaskService taskService;
@@ -26,7 +26,7 @@ public class TaskController {
         return Res.renderJson(
                 result,
                 "Data Has Been Created!",
-                HttpStatus.OK
+                HttpStatus.CREATED
         );
     }
 
@@ -34,11 +34,13 @@ public class TaskController {
     public ResponseEntity<?> getAll(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String dayOfTask,
+            @RequestParam(required = false) String status,
+            @RequestParam String sortBy,
+            @RequestParam(defaultValue = "true") boolean ascending,
             @RequestHeader("Authorization") String token
     ) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Task> res = taskService.getAll(pageable, dayOfTask, token);
+        Page<Task> res = taskService.getAll(pageable, sortBy, ascending, status, token);
         PageResponWrapper<Task> result = new PageResponWrapper<>(res);
         return Res.renderJson(
                 result,
@@ -67,13 +69,23 @@ public class TaskController {
         );
     }
 
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<?> updateStatus(@PathVariable Integer id, @RequestBody TaskDTO request){
+        Task result = taskService.updateStatus(id, request);
+        return Res.renderJson(
+                result,
+                "Status Has Been Updated!",
+                HttpStatus.OK
+        );
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Integer id){
         taskService.delete(id);
         return Res.renderJson(
                 null,
                 "Data Has Been Deleted!",
-                HttpStatus.OK
+                HttpStatus.NO_CONTENT
         );
     }
 }
