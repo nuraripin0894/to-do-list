@@ -41,11 +41,17 @@ public class UserEntityController {
     @PostMapping("/users")
     public ResponseEntity<?> create(@RequestBody UserEntity request){
         UserEntity result = userEntityService.create(request);
-        return Response.success(
+        return new ResponseEntity<>(
                 result,
-                "Data Has Been Created!",
                 HttpStatus.CREATED
         );
+
+//        Use Response.success to include a message
+//        return Response.success(
+//                result,
+//                "Data Has Been Created!",
+//                HttpStatus.CREATED
+//        );
     }
 
     @Cacheable
@@ -56,9 +62,8 @@ public class UserEntityController {
     ) {
         Page<UserEntity> res = userEntityService.getAll(pageable, username);
         PageResponWrapper<UserEntity> result = new PageResponWrapper<>(res);
-        return Response.success(
+        return new ResponseEntity<>(
                 result,
-                result.getTotalElements() == 0 ? "Data Empty!" : "Data Found!",
                 HttpStatus.OK
         );
     }
@@ -67,9 +72,8 @@ public class UserEntityController {
     @GetMapping("/users/{id}")
     public ResponseEntity<?> getOne(@PathVariable Integer id){
         UserEntity result = userEntityService.getOne(id);
-        return Response.success(
+        return new ResponseEntity<>(
                 result,
-                "Data Found!",
                 HttpStatus.OK
         );
     }
@@ -78,9 +82,8 @@ public class UserEntityController {
     @PutMapping("/users/{id}")
     public ResponseEntity<?> update(@PathVariable Integer id, @RequestBody UserEntity request){
         UserEntity result = userEntityService.update(id, request);
-        return Response.success(
+        return new ResponseEntity<>(
                 result,
-                "Data Has Been Updated!",
                 HttpStatus.OK
         );
     }
@@ -89,9 +92,8 @@ public class UserEntityController {
     @DeleteMapping("/users/{id}")
     public ResponseEntity<?> delete(@PathVariable Integer id){
         userEntityService.delete(id);
-        return Response.success(
+        return new ResponseEntity<>(
                 null,
-                "Data Has Been Deleted!",
                 HttpStatus.OK
         );
     }

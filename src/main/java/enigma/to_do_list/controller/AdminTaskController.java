@@ -35,9 +35,8 @@ public class AdminTaskController {
         Pageable pageable = PageRequest.of(page, size);
         Page<TaskDTO> res = taskService.getAll(pageable, sortBy, ascending, status, auth);
         PageResponWrapper<TaskDTO> result = new PageResponWrapper<>(res);
-        return Response.success(
+        return new ResponseEntity<>(
                 result,
-                result.getTotalElements() == 0 ? "Data Empty!" : "Data Found!",
                 HttpStatus.OK
         );
     }
@@ -46,9 +45,8 @@ public class AdminTaskController {
     @GetMapping("/{id}")
     public ResponseEntity<?> getOne(@PathVariable Integer id, Authentication auth){
         TaskDTO result = taskService.getOne(id, auth);
-        return Response.success(
+        return new ResponseEntity<>(
                 result,
-                "Data Found!",
                 HttpStatus.OK
         );
     }

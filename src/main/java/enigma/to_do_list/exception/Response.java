@@ -8,7 +8,6 @@ import java.util.List;
 public class Response {
     public static <T> ResponseEntity<SuccessResponse<T>> success(T data, String message, HttpStatus status) {
         SuccessResponse<T> response = SuccessResponse.<T>builder()
-                .message(message)
                 .status(status.value())
                 .data(data)
                 .build();

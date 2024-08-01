@@ -26,9 +26,8 @@ public class TaskController {
     public ResponseEntity<?> create(@RequestBody TaskDTO request,
                                     Authentication auth){
         Task result = taskService.create(request, auth);
-        return Response.success(
+        return new ResponseEntity<>(
                 result,
-                "Data Has Been Created!",
                 HttpStatus.CREATED
         );
     }
@@ -46,9 +45,8 @@ public class TaskController {
         Pageable pageable = PageRequest.of(page, size);
         Page<TaskDTO> res = taskService.getAll(pageable, sortBy, ascending, status, auth);
         PageResponWrapper<TaskDTO> result = new PageResponWrapper<>(res);
-        return Response.success(
+        return  new ResponseEntity<>(
                 result,
-                result.getTotalElements() == 0 ? "Data Empty!" : "Data Found!",
                 HttpStatus.OK
         );
     }
@@ -57,9 +55,8 @@ public class TaskController {
     @GetMapping("/{id}")
     public ResponseEntity<?> getOne(@PathVariable Integer id, Authentication auth){
         TaskDTO result = taskService.getOne(id, auth);
-        return Response.success(
+        return  new ResponseEntity<>(
                 result,
-                "Data Found!",
                 HttpStatus.OK
         );
     }
@@ -68,9 +65,8 @@ public class TaskController {
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable Integer id, @RequestBody TaskDTO request){
         Task result = taskService.update(id, request);
-        return Response.success(
+        return new ResponseEntity<>(
                 result,
-                "Data Has Been Updated!",
                 HttpStatus.OK
         );
     }
@@ -79,9 +75,8 @@ public class TaskController {
     @PatchMapping("/{id}/status")
     public ResponseEntity<?> updateStatus(@PathVariable Integer id, @RequestBody TaskDTO request){
         Task result = taskService.updateStatus(id, request);
-        return Response.success(
+        return new ResponseEntity<>(
                 result,
-                "Status Has Been Updated!",
                 HttpStatus.OK
         );
     }
@@ -90,9 +85,8 @@ public class TaskController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Integer id){
         taskService.delete(id);
-        return Response.success(
+        return new ResponseEntity<>(
                 null,
-                "Data Has Been Deleted!",
                 HttpStatus.NO_CONTENT
         );
     }
