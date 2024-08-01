@@ -28,22 +28,29 @@ public class SecurityConfig {
     @Autowired
     private JWTAuthFilter jwtAuthFilter;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception{
         httpSecurity.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> request.requestMatchers("/api/auth/register").permitAll()
                         .requestMatchers("/api/auth/login").permitAll()
-                        .requestMatchers(HttpMethod.POST,"/api/auth/refresh").hasAnyAuthority("ADMIN", "USER")
-                        .requestMatchers(HttpMethod.POST,"/user").hasAnyAuthority("ADMIN")
-                        .requestMatchers(HttpMethod.GET,"/user").hasAnyAuthority("ADMIN")
-                        .requestMatchers(HttpMethod.GET,"/user/**").hasAnyAuthority("ADMIN")
-                        .requestMatchers(HttpMethod.PUT,"/user/**").hasAnyAuthority("ADMIN", "USER")
-                        .requestMatchers(HttpMethod.DELETE,"/user/**").hasAnyAuthority("ADMIN", "USER")
-                        .requestMatchers(HttpMethod.POST,"/task").hasAnyAuthority("USER")
-                        .requestMatchers(HttpMethod.GET,"/task").hasAnyAuthority("ADMIN", "USER")
-                        .requestMatchers(HttpMethod.GET,"/task/**").hasAnyAuthority("ADMIN", "USER")
-                        .requestMatchers(HttpMethod.PUT,"/task/**").hasAnyAuthority("ADMIN", "USER")
-                        .requestMatchers(HttpMethod.DELETE,"/task/**").hasAnyAuthority("ADMIN", "USER")
+                        .requestMatchers(HttpMethod.POST,"/api/auth/refresh").hasAnyAuthority("ADMIN", "USER", "SUPER_ADMIN")
+                        .requestMatchers(HttpMethod.POST,"/api/admin/super-admin").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/api/admin/users").hasAnyAuthority("ADMIN", "SUPER_ADMIN")
+                        .requestMatchers(HttpMethod.GET,"/api/admin/users/**").hasAnyAuthority("ADMIN", "SUPER_ADMIN")
+                        .requestMatchers(HttpMethod.PUT,"/api/admin/users/**").hasAnyAuthority("ADMIN", "SUPER_ADMIN")
+                        .requestMatchers(HttpMethod.PATCH,"/api/admin/users/**").hasAnyAuthority("ADMIN", "SUPER_ADMIN")
+                        .requestMatchers(HttpMethod.DELETE,"/api/admin/users/**").hasAnyAuthority("ADMIN", "SUPER_ADMIN")
+                        .requestMatchers(HttpMethod.POST,"/api/auth/todos").hasAnyAuthority("USER")
+                        .requestMatchers(HttpMethod.GET,"/api/auth/todos").hasAnyAuthority("USER")
+                        .requestMatchers(HttpMethod.GET,"/api/auth/todos/**").hasAnyAuthority("USER")
+                        .requestMatchers(HttpMethod.PUT,"/api/auth/todos/**").hasAnyAuthority( "USER")
+                        .requestMatchers(HttpMethod.PATCH,"/api/auth/todos/**").hasAnyAuthority( "USER")
+                        .requestMatchers(HttpMethod.DELETE,"/api/auth/todos/**").hasAnyAuthority("USER")
+                        .requestMatchers(HttpMethod.GET,"/api/admin/todos").hasAnyAuthority("ADMIN", "SUPER_ADMIN")
+                        .requestMatchers(HttpMethod.GET,"/api/admin/todos/**").hasAnyAuthority("ADMIN", "SUPER_ADMIN")
                         .anyRequest().authenticated())
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider()).addFilterBefore(
@@ -56,13 +63,8 @@ public class SecurityConfig {
     public AuthenticationProvider authenticationProvider(){
         DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
         daoAuthenticationProvider.setUserDetailsService(userEntityServiceImplementation);
-        daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
+        daoAuthenticationProvider.setPasswordEncoder(passwordEncoder);
         return daoAuthenticationProvider;
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder(){
-        return new BCryptPasswordEncoder();
     }
 
     @Bean

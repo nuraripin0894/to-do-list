@@ -1,38 +1,52 @@
 package enigma.to_do_list.service.implementation;
 
-import enigma.to_do_list.exception.CustomUserException;
+import enigma.to_do_list.model.Roles;
 import enigma.to_do_list.model.UserEntity;
 import enigma.to_do_list.repository.UserEntityRepository;
 import enigma.to_do_list.service.UserEntityService;
+import enigma.to_do_list.utils.DTO.AuthResponDTO;
 import enigma.to_do_list.utils.specification.UserEntitySpecification;
-import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+
 @Service
-@RequiredArgsConstructor
 public class UserEntityServiceImplementation implements UserEntityService, UserDetailsService {
     private final UserEntityRepository userEntityRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    @Autowired
+    public UserEntityServiceImplementation(UserEntityRepository userEntityRepository, PasswordEncoder passwordEncoder) {
+        this.userEntityRepository = userEntityRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @Override
     public UserEntity create(UserEntity request) {
-        try {
-            return userEntityRepository.save(request);
-        } catch (DataIntegrityViolationException e) {
-            if (e.getCause() != null && e.getCause().getMessage().contains("username")) {
-                throw new CustomUserException("Username already exists, please choose a different one.");
-            } else if (e.getCause() != null && e.getCause().getMessage().contains("email")) {
-                throw new CustomUserException("Email already exists, please choose a different one.");
-            } else {
-                throw new CustomUserException("An error occurred while creating the user.");
-            }
+        return userEntityRepository.save(request);
+    }
+
+    @Override
+    public UserEntity createSuperAdmin(AuthResponDTO request) {
+        UserEntity userEntity = new UserEntity();
+        userEntity.setUsername(request.getUsername());
+        userEntity.setEmail(request.getEmail());
+        String regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*])(?=.*[0-9])[a-zA-Z0-9!@#$%^&*]{12,20}$";
+        if (!request.getPassword().matches(regex)){
+            throw new RuntimeException("not strong enough!");
         }
+        userEntity.setPassword(passwordEncoder.encode(request.getPassword()));
+        userEntity.setRole(Roles.SUPER_ADMIN);
+        userEntity.setCreatedAt(LocalDate.now());
+        return userEntityRepository.save(userEntity);
     }
 
     @Override
@@ -57,6 +71,19 @@ public class UserEntityServiceImplementation implements UserEntityService, UserD
             user.setUsername(request.getUsername() != null ? request.getUsername() : user.getUsername());
             user.setEmail(request.getEmail() != null ? request.getEmail() : user.getEmail());
             user.setPassword(request.getPassword() != null ? request.getPassword() : user.getPassword());
+            user.setRole(request.getRole() != null ? request.getRole() : user.getRole());
+
+            return userEntityRepository.save(user);
+        }
+    }
+
+    @Override
+    public UserEntity changeRole(Integer id, UserEntity request) {
+        if(userEntityRepository.findById(id).isEmpty()){
+            throw new RuntimeException("User with id " + id + " not found!");
+        }
+        else {
+            UserEntity user = this.getOne(id);
             user.setRole(request.getRole() != null ? request.getRole() : user.getRole());
 
             return userEntityRepository.save(user);

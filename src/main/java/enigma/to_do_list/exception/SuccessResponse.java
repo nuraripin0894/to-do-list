@@ -1,17 +1,18 @@
 package enigma.to_do_list.exception;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.*;
-
-import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ErrorResponse<T> {
-    private String status;
+public class SuccessResponse<T> {
     private String message;
-    private String error;
+    private int status;
+    private T data;
 }

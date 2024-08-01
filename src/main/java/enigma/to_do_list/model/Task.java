@@ -3,6 +3,7 @@ package enigma.to_do_list.model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -16,8 +17,6 @@ import java.util.Date;
 @Table(name = "tasks")
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Task {
@@ -50,7 +49,7 @@ public class Task {
     private Date dueDate;
 
     @Enumerated(EnumType.STRING)
-    private taskStatus status;
+    private TaskStatus status;
 
     @Temporal(TemporalType.DATE)
     @Column(name = "created_at")

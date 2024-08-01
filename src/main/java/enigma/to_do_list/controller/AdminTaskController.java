@@ -1,5 +1,6 @@
 package enigma.to_do_list.controller;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import enigma.to_do_list.exception.Response;
 import enigma.to_do_list.model.Task;
 import enigma.to_do_list.service.TaskService;
@@ -16,22 +17,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/todos")
+@RequestMapping("/api/admin/todos")
 @RequiredArgsConstructor
-public class TaskController {
+public class AdminTaskController {
     private final TaskService taskService;
-
-    @Cacheable
-    @PostMapping
-    public ResponseEntity<?> create(@RequestBody TaskDTO request,
-                                    Authentication auth){
-        Task result = taskService.create(request, auth);
-        return Response.success(
-                result,
-                "Data Has Been Created!",
-                HttpStatus.CREATED
-        );
-    }
 
     @Cacheable
     @GetMapping
@@ -61,39 +50,6 @@ public class TaskController {
                 result,
                 "Data Found!",
                 HttpStatus.OK
-        );
-    }
-
-    @Cacheable
-    @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable Integer id, @RequestBody TaskDTO request){
-        Task result = taskService.update(id, request);
-        return Response.success(
-                result,
-                "Data Has Been Updated!",
-                HttpStatus.OK
-        );
-    }
-
-    @Cacheable
-    @PatchMapping("/{id}/status")
-    public ResponseEntity<?> updateStatus(@PathVariable Integer id, @RequestBody TaskDTO request){
-        Task result = taskService.updateStatus(id, request);
-        return Response.success(
-                result,
-                "Status Has Been Updated!",
-                HttpStatus.OK
-        );
-    }
-
-    @Cacheable
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable Integer id){
-        taskService.delete(id);
-        return Response.success(
-                null,
-                "Data Has Been Deleted!",
-                HttpStatus.NO_CONTENT
         );
     }
 }

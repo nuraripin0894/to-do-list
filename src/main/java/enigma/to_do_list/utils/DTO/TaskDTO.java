@@ -1,8 +1,11 @@
 package enigma.to_do_list.utils.DTO;
 
-import enigma.to_do_list.model.taskStatus;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import enigma.to_do_list.model.TaskStatus;
 
 import lombok.*;
+
+import java.time.LocalDate;
 import java.util.Date;
 
 @AllArgsConstructor
@@ -10,9 +13,13 @@ import java.util.Date;
 @Getter
 @Setter
 @Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class TaskDTO {
+    private Integer id;
+    private Integer userId;
     private String title;
     private String description;
     private Date dueDate;
-    private taskStatus status;
+    private TaskStatus status;
+    private LocalDate createdAt;
 }

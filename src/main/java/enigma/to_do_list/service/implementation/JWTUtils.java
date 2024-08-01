@@ -29,7 +29,7 @@ public class JWTUtils {
     public String generateToken(UserEntity userEntity){
         return Jwts.builder()
                 .subject(userEntity.getUsername())
-                .claim("id", userEntity.getId())
+                //.claim("id", userEntity.getId())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + jwtExpirationInMs))
                 .signWith(key)
