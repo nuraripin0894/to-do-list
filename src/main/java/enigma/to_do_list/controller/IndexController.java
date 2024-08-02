@@ -1,6 +1,4 @@
 package enigma.to_do_list.controller;
-
-import enigma.to_do_list.utils.Res;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class IndexController {
     @GetMapping
     public ResponseEntity<?> home(){
-        return Res.renderJson(null, "Nginx load balance test", HttpStatus.OK);
+        return new ResponseEntity<>("Nginx load balance test", HttpStatus.OK);
     }
 }
