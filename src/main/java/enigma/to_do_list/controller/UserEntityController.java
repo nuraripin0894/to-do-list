@@ -1,6 +1,5 @@
 package enigma.to_do_list.controller;
 
-import com.fasterxml.jackson.annotation.JsonView;
 import enigma.to_do_list.exception.Response;
 import enigma.to_do_list.model.UserEntity;
 import enigma.to_do_list.service.UserEntityService;
